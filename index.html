@@ -882,14 +882,68 @@ Total: € ${total}`;
       guestsEl.addEventListener("input", updateSummary);
       areaEl.addEventListener("change", updateSummary);
 
-      document.getElementById("bookingForm").addEventListener("submit", function(e) {
-        e.preventDefault();
-        paymentStatus.style.display = "block";
-        paymentStatus.className = "status-box status-error";
-        document.getElementById("statusTitle").textContent = translations[currentLang].statusTitle;
-        document.getElementById("statusText").textContent = translations[currentLang].statusText;
-        paymentStatus.scrollIntoView({ behavior: "smooth", block: "center" });
-      });
+      document.getElementById("bookingForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const data = getFormData();
+  const total = getTotal();
+
+  if (!data.date || !data.name || !data.email || !data.phone) {
+    paymentStatus.style.display = "block";
+    paymentStatus.className = "status-box status-error";
+    document.getElementById("statusTitle").textContent =
+      currentLang === "it" ? "Dati mancanti" : "Missing data";
+    document.getElementById("statusText").textContent =
+      currentLang === "it"
+        ? "Compila tutti i campi obbligatori prima di procedere al pagamento."
+        : "Please fill in all required fields before proceeding to payment.";
+    paymentStatus.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  payButton.disabled = true;
+  const oldButtonText = payButton.textContent;
+  payButton.textContent = currentLang === "it" ? "Reindirizzamento..." : "Redirecting...";
+
+  try {
+    const response = await fetch("/api/create-checkout-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        booking: {
+          ...data,
+          total,
+        },
+        successUrl: `${window.location.origin}/?payment=success`,
+        cancelUrl: `${window.location.origin}/?payment=cancel`,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.url) {
+      throw new Error(result.error || "Unable to create Stripe checkout session");
+    }
+
+    window.location.href = result.url;
+  } catch (error) {
+    paymentStatus.style.display = "block";
+    paymentStatus.className = "status-box status-error";
+    document.getElementById("statusTitle").textContent =
+      currentLang === "it" ? "Errore pagamento" : "Payment error";
+    document.getElementById("statusText").textContent =
+      error.message ||
+      (currentLang === "it"
+        ? "Impossibile avviare Stripe."
+        : "Unable to start Stripe.");
+    paymentStatus.scrollIntoView({ behavior: "smooth", block: "center" });
+  } finally {
+    payButton.disabled = false;
+    payButton.textContent = oldButtonText;
+  }
+});
 
       waButton.addEventListener("click", function() {
         window.open(buildWhatsappUrl(), "_blank");
