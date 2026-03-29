@@ -955,6 +955,30 @@ Total: € ${total}`;
       fillVenues(cityEl.value);
       updateSummary();
       applyTranslations("it");
+      const params = new URLSearchParams(window.location.search);
+const payment = params.get("payment");
+
+if (payment === "success") {
+  paymentStatus.style.display = "block";
+  paymentStatus.className = "status-box status-success";
+  document.getElementById("statusTitle").textContent =
+    currentLang === "it" ? "Pagamento confermato" : "Payment confirmed";
+  document.getElementById("statusText").textContent =
+    currentLang === "it"
+      ? "Pagamento riuscito. La prenotazione è confermata. Puoi anche aprire WhatsApp per il riepilogo."
+      : "Payment successful. Your booking is confirmed. You can also open WhatsApp for the summary.";
+}
+
+if (payment === "cancel") {
+  paymentStatus.style.display = "block";
+  paymentStatus.className = "status-box status-error";
+  document.getElementById("statusTitle").textContent =
+    currentLang === "it" ? "Pagamento annullato" : "Payment cancelled";
+  document.getElementById("statusText").textContent =
+    currentLang === "it"
+      ? "Il pagamento non è stato completato. Puoi riprovare."
+      : "The payment was not completed. You can try again.";
+}
     </script>
   </body>
 </html>
