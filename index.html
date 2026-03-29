@@ -1,10 +1,906 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NightPass</title>
+    <style>
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: linear-gradient(180deg, #07070c 0%, #10101a 100%);
+        color: white;
+      }
+      a { text-decoration: none; color: inherit; }
+      .container { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: rgba(9, 9, 15, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px 0;
+      }
+      .brand h1 {
+        margin: 0;
+        font-size: 26px;
+      }
+      .brand p {
+        margin: 4px 0 0;
+        color: #b7b7c9;
+        font-size: 13px;
+      }
+      .nav-links {
+        display: flex;
+        gap: 18px;
+        color: #d7d7e3;
+        font-size: 14px;
+        align-items: center;
+      }
+      .lang-toggle {
+        display: flex;
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .lang-toggle button {
+        background: transparent;
+        color: #ddd;
+        border: 0;
+        padding: 10px 14px;
+        cursor: pointer;
+      }
+      .lang-toggle button.active {
+        background: #d400ff;
+        color: white;
+        font-weight: bold;
+      }
+
+      .hero {
+        padding: 70px 0 40px;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+      }
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 30px;
+      }
+      .badge {
+        display: inline-block;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(212,0,255,0.12);
+        border: 1px solid rgba(212,0,255,0.28);
+        color: #f2cfff;
+        font-size: 12px;
+        margin-bottom: 18px;
+      }
+      .hero h2 {
+        font-size: 56px;
+        line-height: 1.03;
+        margin: 0 0 18px;
+      }
+      .hero p {
+        font-size: 18px;
+        line-height: 1.7;
+        color: #d2d2dd;
+        margin: 0 0 24px;
+        max-width: 720px;
+      }
+      .hero-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        padding: 14px 18px;
+        font-weight: bold;
+        cursor: pointer;
+        border: 0;
+        transition: 0.2s ease;
+      }
+      .btn:hover { transform: translateY(-1px); }
+      .btn-primary {
+        background: white;
+        color: #0b0b12;
+      }
+      .btn-secondary {
+        background: transparent;
+        color: white;
+        border: 1px solid rgba(255,255,255,0.14);
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 24px;
+        max-width: 560px;
+      }
+      .stat-card, .card {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.09);
+        border-radius: 24px;
+      }
+      .stat-card {
+        padding: 18px;
+      }
+      .stat-card strong {
+        display: block;
+        font-size: 28px;
+        margin-bottom: 6px;
+      }
+      .stat-card span {
+        color: #bdbdca;
+        font-size: 14px;
+      }
+
+      .summary {
+        padding: 22px;
+      }
+      .summary h3,
+      .section h3,
+      .side-card h3 {
+        margin-top: 0;
+        font-size: 24px;
+      }
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        background: rgba(0,0,0,0.25);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 18px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+      }
+      .summary-row span:first-child { color: #c9c9d5; }
+      .summary-row strong { text-align: right; }
+      .summary-note {
+        margin-top: 14px;
+        color: #b0b0bf;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .section {
+        padding: 56px 0;
+      }
+      .section-header {
+        max-width: 760px;
+        margin-bottom: 24px;
+      }
+      .section-header p {
+        color: #c9c9d5;
+        line-height: 1.7;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+      }
+      .feature, .venue-card, .faq-card, .side-card {
+        padding: 22px;
+      }
+      .feature p, .venue-card p, .faq-card p, .side-card p, .side-card li {
+        color: #c9c9d5;
+        line-height: 1.7;
+      }
+      .venue-list {
+        margin-top: 12px;
+        display: grid;
+        gap: 10px;
+      }
+      .venue-pill {
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
+        padding: 10px 12px;
+        background: rgba(0,0,0,0.22);
+      }
+
+      .booking-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 22px;
+      }
+      .form-card {
+        padding: 22px;
+      }
+      form {
+        display: grid;
+        gap: 16px;
+      }
+      .field-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      .field-full { grid-column: 1 / -1; }
+      label {
+        display: block;
+        font-size: 14px;
+        color: #dcdcea;
+      }
+      .label {
+        margin-bottom: 8px;
+        display: block;
+      }
+      input, select, textarea {
+        width: 100%;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: #0b0b12;
+        color: white;
+        border-radius: 16px;
+        padding: 14px;
+        font-size: 15px;
+        outline: none;
+      }
+      textarea { resize: vertical; min-height: 120px; }
+      .form-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255,255,255,0.08);
+      }
+      .total-box small {
+        display: block;
+        color: #bfbfcb;
+        margin-bottom: 6px;
+      }
+      .total-box strong {
+        font-size: 30px;
+      }
+      .btn-pay {
+        background: #d400ff;
+        color: white;
+      }
+      .btn-wa {
+        background: #1fa855;
+        color: white;
+      }
+
+      .status-box {
+        margin-top: 18px;
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.1);
+        display: none;
+      }
+      .status-success {
+        background: rgba(39, 174, 96, 0.12);
+        border-color: rgba(39, 174, 96, 0.35);
+      }
+      .status-error {
+        background: rgba(255, 179, 0, 0.12);
+        border-color: rgba(255, 179, 0, 0.35);
+      }
+      .status-box h4 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+      .status-box p {
+        margin: 0;
+        color: #e1e1ea;
+        line-height: 1.7;
+      }
+
+      footer {
+        border-top: 1px solid rgba(255,255,255,0.08);
+        color: #b9b9c7;
+        padding: 22px 0 36px;
+        text-align: center;
+      }
+
+      @media (max-width: 980px) {
+        .hero-grid, .booking-grid, .grid-3, .grid-2, .field-grid {
+          grid-template-columns: 1fr;
+        }
+        .hero h2 { font-size: 40px; }
+        .nav-links { display: none; }
+      }
+    </style>
   </head>
   <body>
-    <h1>NightPass è online 🚀</h1>
+    <header class="nav">
+      <div class="container nav-inner">
+        <div class="brand">
+          <h1>NightPass</h1>
+          <p id="brandTagline">Prenotazioni nightlife rapide, chiare e dirette</p>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:14px;">
+          <nav class="nav-links">
+            <a href="#how" id="navHow">Come funziona</a>
+            <a href="#locations" id="navLocations">Location</a>
+            <a href="#book" id="navBook">Prenota</a>
+            <a href="#faq" id="navFaq">FAQ</a>
+          </nav>
+
+          <div class="lang-toggle">
+            <button id="langIt" class="active" type="button">IT</button>
+            <button id="langEn" type="button">EN</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="badge" id="heroBadge">Pagamento Stripe + conferma automatica + riepilogo WhatsApp</div>
+          <h2 id="heroTitle">Prenota e paga la tua serata in pochi minuti.</h2>
+          <p id="heroText">
+            NightPass raccoglie i dati della prenotazione, manda il cliente al checkout Stripe e, dopo il pagamento riuscito, mostra la prenotazione come confermata e prepara anche il messaggio WhatsApp.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#book" id="heroBtn1">Prenota ora</a>
+            <a class="btn btn-secondary" href="#locations" id="heroBtn2">Vedi location</a>
+          </div>
+
+          <div class="stats">
+            <div class="stat-card">
+              <strong>3</strong>
+              <span id="stat1">città attive</span>
+            </div>
+            <div class="stat-card">
+              <strong>9</strong>
+              <span id="stat2">club selezionati</span>
+            </div>
+            <div class="stat-card">
+              <strong>24/7</strong>
+              <span id="stat3">richieste online</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card summary">
+          <h3 id="summaryTitle">Riepilogo rapido</h3>
+          <div class="summary-row"><span id="sumCityLabel">Città</span><strong id="sumCity">Milano</strong></div>
+          <div class="summary-row"><span id="sumVenueLabel">Location</span><strong id="sumVenue">Velvet Club</strong></div>
+          <div class="summary-row"><span id="sumPackageLabel">Pacchetto</span><strong id="sumPackage">Standard Entry</strong></div>
+          <div class="summary-row"><span id="sumPeopleLabel">Persone</span><strong id="sumPeople">2</strong></div>
+          <div class="summary-row"><span id="sumPaymentLabel">Pagamento</span><strong id="sumPayment">Stripe Checkout</strong></div>
+          <div class="summary-row" style="background:rgba(212,0,255,0.12);border-color:rgba(212,0,255,0.25);">
+            <span id="sumTotalLabel">Totale stimato</span><strong id="sumTotal">€ 40</strong>
+          </div>
+          <div class="summary-note" id="summaryNote">
+            Questa è un'anteprima front-end completa. Il pulsante Stripe è predisposto ma il pagamento reale non è ancora collegato.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how">
+      <div class="container">
+        <div class="section-header">
+          <h3 id="howTitle">Come funziona</h3>
+          <p id="howText">Flusso semplice, chiaro e già impostato per pagamento automatico.</p>
+        </div>
+
+        <div class="grid-3">
+          <div class="card feature">
+            <h3 id="step1Title">1. Compila la prenotazione</h3>
+            <p id="step1Text">Il cliente sceglie città, club, data, numero persone e pacchetto.</p>
+          </div>
+          <div class="card feature">
+            <h3 id="step2Title">2. Vai al checkout Stripe</h3>
+            <p id="step2Text">Il sito prepara il checkout Stripe per il pagamento totale.</p>
+          </div>
+          <div class="card feature">
+            <h3 id="step3Title">3. Ritorna confermato</h3>
+            <p id="step3Text">Dopo il pagamento riuscito, la prenotazione risulta confermata e si può aprire anche WhatsApp.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="locations" style="border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);">
+      <div class="container">
+        <div class="section-header">
+          <h3 id="locationsTitle">Location disponibili</h3>
+          <p id="locationsText">Una selezione semplice di club in tre città.</p>
+        </div>
+
+        <div class="grid-3">
+          <div class="card venue-card">
+            <h3>Milano</h3>
+            <div class="venue-list">
+              <div class="venue-pill">Velvet Club</div>
+              <div class="venue-pill">Noir Room</div>
+              <div class="venue-pill">Pulse Milano</div>
+            </div>
+            <p id="locNoteMilano">Target premium, serate house e commerciale.</p>
+          </div>
+          <div class="card venue-card">
+            <h3>Roma</h3>
+            <div class="venue-list">
+              <div class="venue-pill">Luna Lounge</div>
+              <div class="venue-pill">District Roma</div>
+              <div class="venue-pill">Aurora Club</div>
+            </div>
+            <p id="locNoteRoma">Format serali misti, tavoli e ingressi prioritari.</p>
+          </div>
+          <div class="card venue-card">
+            <h3>Torino</h3>
+            <div class="venue-list">
+              <div class="venue-pill">Vault Torino</div>
+              <div class="venue-pill">Skyline Room</div>
+              <div class="venue-pill">District 21</div>
+            </div>
+            <p id="locNoteTorino">Location adatte a gruppi e prenotazioni weekend.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="book">
+      <div class="container">
+        <div class="section-header">
+          <h3 id="bookTitle">Prenota ora</h3>
+          <p id="bookText">
+            Compila il form e procedi al pagamento totale con Stripe. In questa anteprima il pagamento non è ancora collegato realmente.
+          </p>
+        </div>
+
+        <div class="booking-grid">
+          <div class="card form-card">
+            <form id="bookingForm">
+              <div class="field-grid">
+                <label>
+                  <span class="label" id="labelCity">Città</span>
+                  <select id="city" name="city">
+                    <option value="Milano">Milano</option>
+                    <option value="Roma">Roma</option>
+                    <option value="Torino">Torino</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span class="label" id="labelVenue">Location</span>
+                  <select id="venue" name="venue"></select>
+                </label>
+
+                <label>
+                  <span class="label" id="labelDate">Data</span>
+                  <input id="date" name="date" type="date" required />
+                </label>
+
+                <label>
+                  <span class="label" id="labelGuests">Numero persone</span>
+                  <input id="guests" name="guests" type="number" min="1" max="20" value="2" required />
+                </label>
+
+                <label class="field-full">
+                  <span class="label" id="labelPackage">Pacchetto</span>
+                  <select id="area" name="area">
+                    <option value="Standard Entry">Standard Entry — € 20 a persona</option>
+                    <option value="Priority Entry">Priority Entry — € 35 a persona</option>
+                    <option value="Table Basic">Table Basic — € 120 a prenotazione</option>
+                    <option value="VIP Table">VIP Table — € 250 a prenotazione</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span class="label" id="labelName">Nome e cognome</span>
+                  <input id="name" name="name" type="text" required />
+                </label>
+
+                <label>
+                  <span class="label" id="labelEmail">Email</span>
+                  <input id="email" name="email" type="email" required />
+                </label>
+
+                <label class="field-full">
+                  <span class="label" id="labelPhone">Telefono</span>
+                  <input id="phone" name="phone" type="tel" required />
+                </label>
+
+                <label class="field-full">
+                  <span class="label" id="labelNotes">Note</span>
+                  <textarea id="notes" name="notes"></textarea>
+                </label>
+              </div>
+
+              <div class="form-footer">
+                <div class="total-box">
+                  <small id="totalLabel">Totale stimato</small>
+                  <strong id="formTotal">€ 40</strong>
+                </div>
+
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                  <button type="button" class="btn btn-wa" id="waButton">Apri WhatsApp</button>
+                  <button type="submit" class="btn btn-pay" id="payButton">Paga ora con Stripe</button>
+                </div>
+              </div>
+            </form>
+
+            <div id="paymentStatus" class="status-box status-error">
+              <h4 id="statusTitle">Stripe non ancora collegato</h4>
+              <p id="statusText">Il design e il flusso sono pronti, ma per il pagamento reale va collegato il backend Stripe.</p>
+            </div>
+          </div>
+
+          <div style="display:grid;gap:18px;">
+            <div class="card side-card">
+              <h3 id="pricesTitle">Prezzi base</h3>
+              <p>Standard Entry — € 20</p>
+              <p>Priority Entry — € 35</p>
+              <p>Table Basic — € 120</p>
+              <p>VIP Table — € 250</p>
+            </div>
+
+            <div class="card side-card">
+              <h3 id="nextTitle">Cosa succede dopo</h3>
+              <ul id="nextList">
+                <li>Il cliente compila tutti i dati</li>
+                <li>Il totale si aggiorna automaticamente</li>
+                <li>Puoi aprire WhatsApp con riepilogo</li>
+                <li>Stripe sarà collegato nel passaggio successivo</li>
+              </ul>
+            </div>
+
+            <div class="card side-card" style="background:rgba(212,0,255,0.12);border-color:rgba(212,0,255,0.25);">
+              <h3 id="stripeInfoTitle">Stato Stripe</h3>
+              <p id="stripeInfoText">La publishable key è stata inserita, ma il pagamento non è ancora attivo perché manca il collegamento server-side.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq" style="border-top:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);">
+      <div class="container">
+        <div class="section-header">
+          <h3 id="faqTitle">FAQ</h3>
+          <p id="faqText">Le informazioni essenziali che un utente si aspetta di trovare.</p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card faq-card">
+            <h3 id="faq1Title">La prenotazione si conferma da sola?</h3>
+            <p id="faq1Text">Quando Stripe sarà collegato correttamente, sì. In questa anteprima no, perché il pagamento reale non è ancora attivo.</p>
+          </div>
+          <div class="card faq-card">
+            <h3 id="faq2Title">Serve ancora WhatsApp?</h3>
+            <p id="faq2Text">Non è obbligatorio, ma è utile per riepilogo, assistenza e gestione operativa.</p>
+          </div>
+          <div class="card faq-card">
+            <h3 id="faq3Title">Il sito è già utilizzabile?</h3>
+            <p id="faq3Text">Sì come anteprima completa del sito. Per l’incasso vero manca solo la parte backend Stripe.</p>
+          </div>
+          <div class="card faq-card">
+            <h3 id="faq4Title">È adatto anche da telefono?</h3>
+            <p id="faq4Text">Sì, il layout è responsive e resta semplice da usare anche da mobile.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container" id="footerText">
+        © 2026 NightPass — anteprima completa del sito con WhatsApp e Stripe non ancora collegato.
+      </div>
+    </footer>
+
+    <script>
+      const WHATSAPP_NUMBER = "393383396531";
+
+      const venuesByCity = {
+        Milano: ["Velvet Club", "Noir Room", "Pulse Milano"],
+        Roma: ["Luna Lounge", "District Roma", "Aurora Club"],
+        Torino: ["Vault Torino", "Skyline Room", "District 21"]
+      };
+
+      const prices = {
+        "Standard Entry": 20,
+        "Priority Entry": 35,
+        "Table Basic": 120,
+        "VIP Table": 250
+      };
+
+      const translations = {
+        it: {
+          brandTagline: "Prenotazioni nightlife rapide, chiare e dirette",
+          navHow: "Come funziona",
+          navLocations: "Location",
+          navBook: "Prenota",
+          navFaq: "FAQ",
+          heroBadge: "Pagamento Stripe + conferma automatica + riepilogo WhatsApp",
+          heroTitle: "Prenota e paga la tua serata in pochi minuti.",
+          heroText: "NightPass raccoglie i dati della prenotazione, manda il cliente al checkout Stripe e, dopo il pagamento riuscito, mostra la prenotazione come confermata e prepara anche il messaggio WhatsApp.",
+          heroBtn1: "Prenota ora",
+          heroBtn2: "Vedi location",
+          stat1: "città attive",
+          stat2: "club selezionati",
+          stat3: "richieste online",
+          summaryTitle: "Riepilogo rapido",
+          sumCityLabel: "Città",
+          sumVenueLabel: "Location",
+          sumPackageLabel: "Pacchetto",
+          sumPeopleLabel: "Persone",
+          sumPaymentLabel: "Pagamento",
+          sumTotalLabel: "Totale stimato",
+          summaryNote: "Questa è un'anteprima front-end completa. Il pulsante Stripe è predisposto ma il pagamento reale non è ancora collegato.",
+          howTitle: "Come funziona",
+          howText: "Flusso semplice, chiaro e già impostato per pagamento automatico.",
+          step1Title: "1. Compila la prenotazione",
+          step1Text: "Il cliente sceglie città, club, data, numero persone e pacchetto.",
+          step2Title: "2. Vai al checkout Stripe",
+          step2Text: "Il sito prepara il checkout Stripe per il pagamento totale.",
+          step3Title: "3. Ritorna confermato",
+          step3Text: "Dopo il pagamento riuscito, la prenotazione risulta confermata e si può aprire anche WhatsApp.",
+          locationsTitle: "Location disponibili",
+          locationsText: "Una selezione semplice di club in tre città.",
+          locNoteMilano: "Target premium, serate house e commerciale.",
+          locNoteRoma: "Format serali misti, tavoli e ingressi prioritari.",
+          locNoteTorino: "Location adatte a gruppi e prenotazioni weekend.",
+          bookTitle: "Prenota ora",
+          bookText: "Compila il form e procedi al pagamento totale con Stripe. In questa anteprima il pagamento non è ancora collegato realmente.",
+          labelCity: "Città",
+          labelVenue: "Location",
+          labelDate: "Data",
+          labelGuests: "Numero persone",
+          labelPackage: "Pacchetto",
+          labelName: "Nome e cognome",
+          labelEmail: "Email",
+          labelPhone: "Telefono",
+          labelNotes: "Note",
+          totalLabel: "Totale stimato",
+          pricesTitle: "Prezzi base",
+          nextTitle: "Cosa succede dopo",
+          nextList: [
+            "Il cliente compila tutti i dati",
+            "Il totale si aggiorna automaticamente",
+            "Puoi aprire WhatsApp con riepilogo",
+            "Stripe sarà collegato nel passaggio successivo"
+          ],
+          stripeInfoTitle: "Stato Stripe",
+          stripeInfoText: "La publishable key è stata inserita, ma il pagamento non è ancora attivo perché manca il collegamento server-side.",
+          faqTitle: "FAQ",
+          faqText: "Le informazioni essenziali che un utente si aspetta di trovare.",
+          faq1Title: "La prenotazione si conferma da sola?",
+          faq1Text: "Quando Stripe sarà collegato correttamente, sì. In questa anteprima no, perché il pagamento reale non è ancora attivo.",
+          faq2Title: "Serve ancora WhatsApp?",
+          faq2Text: "Non è obbligatorio, ma è utile per riepilogo, assistenza e gestione operativa.",
+          faq3Title: "Il sito è già utilizzabile?",
+          faq3Text: "Sì come anteprima completa del sito. Per l’incasso vero manca solo la parte backend Stripe.",
+          faq4Title: "È adatto anche da telefono?",
+          faq4Text: "Sì, il layout è responsive e resta semplice da usare anche da mobile.",
+          footerText: "© 2026 NightPass — anteprima completa del sito con WhatsApp e Stripe non ancora collegato.",
+          payButton: "Paga ora con Stripe",
+          waButton: "Apri WhatsApp",
+          statusTitle: "Stripe non ancora collegato",
+          statusText: "Il design e il flusso sono pronti, ma per il pagamento reale va collegato il backend Stripe."
+        },
+        en: {
+          brandTagline: "Fast, clear nightlife bookings",
+          navHow: "How it works",
+          navLocations: "Locations",
+          navBook: "Book",
+          navFaq: "FAQ",
+          heroBadge: "Stripe payment + automatic confirmation + WhatsApp summary",
+          heroTitle: "Book and pay for your night out in a few minutes.",
+          heroText: "NightPass collects booking details, sends the customer to Stripe checkout and, after successful payment, shows the booking as confirmed and prepares a WhatsApp summary.",
+          heroBtn1: "Book now",
+          heroBtn2: "View locations",
+          stat1: "active cities",
+          stat2: "selected clubs",
+          stat3: "online requests",
+          summaryTitle: "Quick summary",
+          sumCityLabel: "City",
+          sumVenueLabel: "Venue",
+          sumPackageLabel: "Package",
+          sumPeopleLabel: "People",
+          sumPaymentLabel: "Payment",
+          sumTotalLabel: "Estimated total",
+          summaryNote: "This is a complete front-end preview. The Stripe button is ready, but real payment is not connected yet.",
+          howTitle: "How it works",
+          howText: "Simple, clear flow already designed for automatic payment.",
+          step1Title: "1. Fill in the booking",
+          step1Text: "The customer chooses city, club, date, number of guests and package.",
+          step2Title: "2. Go to Stripe checkout",
+          step2Text: "The site prepares Stripe checkout for full payment.",
+          step3Title: "3. Return confirmed",
+          step3Text: "After successful payment, the booking is confirmed and WhatsApp can also be opened.",
+          locationsTitle: "Available venues",
+          locationsText: "A simple selection of clubs in three cities.",
+          locNoteMilano: "Premium target, house and commercial nights.",
+          locNoteRoma: "Mixed nightlife formats, tables and priority entry.",
+          locNoteTorino: "Suitable venues for groups and weekend bookings.",
+          bookTitle: "Book now",
+          bookText: "Fill in the form and proceed to full payment with Stripe. In this preview the real payment is not connected yet.",
+          labelCity: "City",
+          labelVenue: "Venue",
+          labelDate: "Date",
+          labelGuests: "Number of guests",
+          labelPackage: "Package",
+          labelName: "Full name",
+          labelEmail: "Email",
+          labelPhone: "Phone",
+          labelNotes: "Notes",
+          totalLabel: "Estimated total",
+          pricesTitle: "Base prices",
+          nextTitle: "What happens next",
+          nextList: [
+            "The customer fills in all details",
+            "The total updates automatically",
+            "You can open WhatsApp with summary",
+            "Stripe will be connected in the next step"
+          ],
+          stripeInfoTitle: "Stripe status",
+          stripeInfoText: "The publishable key has been inserted, but payment is not active yet because the server-side connection is still missing.",
+          faqTitle: "FAQ",
+          faqText: "The essential information users expect to find.",
+          faq1Title: "Does the booking confirm itself?",
+          faq1Text: "Yes when Stripe is connected correctly. In this preview no, because the real payment is not active yet.",
+          faq2Title: "Is WhatsApp still needed?",
+          faq2Text: "It is not mandatory, but it is useful for summaries, support and operational follow-up.",
+          faq3Title: "Is the site already usable?",
+          faq3Text: "Yes as a complete site preview. For real payments only the Stripe backend is still missing.",
+          faq4Title: "Is it mobile friendly?",
+          faq4Text: "Yes, the layout is responsive and easy to use on mobile too.",
+          footerText: "© 2026 NightPass — complete site preview with WhatsApp and Stripe not connected yet.",
+          payButton: "Pay now with Stripe",
+          waButton: "Open WhatsApp",
+          statusTitle: "Stripe not connected yet",
+          statusText: "The design and flow are ready, but the real payment needs the Stripe backend connection."
+        }
+      };
+
+      const cityEl = document.getElementById("city");
+      const venueEl = document.getElementById("venue");
+      const guestsEl = document.getElementById("guests");
+      const areaEl = document.getElementById("area");
+      const payButton = document.getElementById("payButton");
+      const waButton = document.getElementById("waButton");
+      const paymentStatus = document.getElementById("paymentStatus");
+
+      let currentLang = "it";
+
+      function fillVenues(city) {
+        venueEl.innerHTML = "";
+        venuesByCity[city].forEach(venue => {
+          const option = document.createElement("option");
+          option.value = venue;
+          option.textContent = venue;
+          venueEl.appendChild(option);
+        });
+      }
+
+      function getTotal() {
+        const area = areaEl.value;
+        const guests = Math.max(1, Number(guestsEl.value) || 1);
+        const price = prices[area] || 0;
+        return area.toLowerCase().includes("table") ? price : price * guests;
+      }
+
+      function updateSummary() {
+        const total = getTotal();
+        document.getElementById("sumCity").textContent = cityEl.value;
+        document.getElementById("sumVenue").textContent = venueEl.value;
+        document.getElementById("sumPackage").textContent = areaEl.value;
+        document.getElementById("sumPeople").textContent = guestsEl.value || "1";
+        document.getElementById("sumTotal").textContent = `€ ${total}`;
+        document.getElementById("formTotal").textContent = `€ ${total}`;
+      }
+
+      function getFormData() {
+        return {
+          city: document.getElementById("city").value,
+          venue: document.getElementById("venue").value,
+          date: document.getElementById("date").value,
+          guests: document.getElementById("guests").value,
+          area: document.getElementById("area").value,
+          name: document.getElementById("name").value,
+          email: document.getElementById("email").value,
+          phone: document.getElementById("phone").value,
+          notes: document.getElementById("notes").value
+        };
+      }
+
+      function buildWhatsappUrl() {
+        const data = getFormData();
+        const total = getTotal();
+        const text =
+          currentLang === "it"
+            ? `Prenotazione NightPass
+
+Città: ${data.city}
+Location: ${data.venue}
+Data: ${data.date || "-"}
+Persone: ${data.guests}
+Pacchetto: ${data.area}
+Nome: ${data.name || "-"}
+Email: ${data.email || "-"}
+Telefono: ${data.phone || "-"}
+Note: ${data.notes || "-"}
+Totale: € ${total}`
+            : `NightPass booking
+
+City: ${data.city}
+Venue: ${data.venue}
+Date: ${data.date || "-"}
+Guests: ${data.guests}
+Package: ${data.area}
+Name: ${data.name || "-"}
+Email: ${data.email || "-"}
+Phone: ${data.phone || "-"}
+Notes: ${data.notes || "-"}
+Total: € ${total}`;
+
+        return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+      }
+
+      function applyTranslations(lang) {
+        currentLang = lang;
+        const t = translations[lang];
+
+        Object.keys(t).forEach(id => {
+          const el = document.getElementById(id);
+          if (!el) return;
+
+          if (id === "nextList") {
+            el.innerHTML = t[id].map(item => `<li>${item}</li>`).join("");
+          } else {
+            el.textContent = t[id];
+          }
+        });
+
+        payButton.textContent = t.payButton;
+        waButton.textContent = t.waButton;
+
+        document.getElementById("langIt").classList.toggle("active", lang === "it");
+        document.getElementById("langEn").classList.toggle("active", lang === "en");
+      }
+
+      cityEl.addEventListener("change", () => {
+        fillVenues(cityEl.value);
+        updateSummary();
+      });
+
+      venueEl.addEventListener("change", updateSummary);
+      guestsEl.addEventListener("input", updateSummary);
+      areaEl.addEventListener("change", updateSummary);
+
+      document.getElementById("bookingForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        paymentStatus.style.display = "block";
+        paymentStatus.className = "status-box status-error";
+        document.getElementById("statusTitle").textContent = translations[currentLang].statusTitle;
+        document.getElementById("statusText").textContent = translations[currentLang].statusText;
+        paymentStatus.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+
+      waButton.addEventListener("click", function() {
+        window.open(buildWhatsappUrl(), "_blank");
+      });
+
+      document.getElementById("langIt").addEventListener("click", () => applyTranslations("it"));
+      document.getElementById("langEn").addEventListener("click", () => applyTranslations("en"));
+
+      fillVenues(cityEl.value);
+      updateSummary();
+      applyTranslations("it");
+    </script>
   </body>
 </html>
